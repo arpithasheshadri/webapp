@@ -25,6 +25,17 @@ app.use(bodyParser.raw({type: '*/*'}));
 
 
 Router(app);
+sequelize.sync()
+    .then(() => {
+        console.log('Database synchronization successful.');
+    })
+    .catch(err => {
+        console.error('Database synchronization failed:', err);
+    });
+
+app.listen(process.env.SERVER_PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
+});
 
 export default sequelize;
 
