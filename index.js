@@ -25,7 +25,7 @@ app.use(bodyParser.raw({type: '*/*'}));
 
 
 Router(app);
-sequelize.sync()
+sequelize.sync({ force: false, alter:true })
     .then(() => {
         console.log('Database synchronization successful.');
     })
