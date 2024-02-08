@@ -40,7 +40,7 @@ export const validate = (payload = {}) => {
 
     const isEmail = emailPattern.test(username);
 
-    const isPasswordValid = passwordPattern.test(password);
+     const isPasswordValid = passwordPattern.test(password);
 
     const isFirstnameString = typeof first_name === 'string';
     const isLastnameString = typeof last_name === 'string';
