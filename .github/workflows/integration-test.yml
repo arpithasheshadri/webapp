@@ -1,4 +1,49 @@
-name: integration testing api
+# name: integration testing api
+# on:
+#     push:
+#         branches: [ "main" ]
+#     pull_request:
+#         branches: [ "main" ]
+
+# jobs:
+#     api-test:
+#         runs-on: ubuntu-latest
+#         strategy:
+#             matrix:
+#                 node-version: [20.x]
+#         services:
+#             postgres:
+#                 image: postgres
+#                 env:
+#                     POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+#                     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#                     POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+#                 ports:
+#                     - 5432:5432
+#                 options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+#         steps:
+#             - uses: actions/checkout@v2
+
+#             - name: Use Node.js ${{ matrix.node-version }}
+#               uses: actions/setup-node@v1
+#               with:
+#                   node-version: ${{ matrix.node-version }}
+
+#             - name: Install Dependencies
+#               run: npm ci
+
+#             - name: API testing
+#               run: npm run test
+#               env:
+#                   DB_USER: ${{ secrets.POSTGRES_USER }}
+#                   DB_HOST: ${{ secrets.POSTGRES_HOST }}
+#                   DATABASE: ${{ secrets.POSTGRES_DB }}
+#                   DB_HMAC: ${{ secrets.POSTGRES_PASSWORD }}
+#                   DB_PORT: ${{ secrets.POSTGRES_DB_PORT }}
+#                   DB_DIALECT: ${{ secrets.POSTGRES_DB_DIALECT }}
+#                   APP_PORT: ${{ secrets.NODE_APP_PORT }}
+name: Integration Tests
+
 on:
     push:
         branches: [ "main" ]
@@ -6,39 +51,36 @@ on:
         branches: [ "main" ]
 
 jobs:
-    api-test:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version: [20.x]
-        services:
-            postgres:
-                image: postgres
-                env:
-                    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-                    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-                    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-                ports:
-                    - 5432:5432
-                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-        steps:
-            - uses: actions/checkout@v2
+  integration-tests:
+    runs-on: ubuntu-latest
 
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-            - name: Install Dependencies
-              run: npm ci
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.x"
 
-            - name: API testing
-              run: npm run test
-              env:
-                  DB_USER: ${{ secrets.POSTGRES_USER }}
-                  DB_HOST: ${{ secrets.POSTGRES_HOST }}
-                  DATABASE: ${{ secrets.POSTGRES_DB }}
-                  DB_HMAC: ${{ secrets.POSTGRES_PASSWORD }}
-                  DB_PORT: ${{ secrets.POSTGRES_DB_PORT }}
-                  DB_DIALECT: ${{ secrets.POSTGRES_DB_DIALECT }}
-                  APP_PORT: ${{ secrets.NODE_APP_PORT }}
+      # Install PostgreSQL client (e.g., psql)
+      - name: Install PostgreSQL client
+        run: sudo apt-get install -y postgresql-client
+
+      # Set up PostgreSQL connection using secrets
+      - name: Configure PostgreSQL connection
+        run: |
+          export PGHOST=$DB_HOST
+          export PGUSER=$DB_USER
+          export PGPASSWORD=$DB_PASSWORD
+          export PGDATABASE=$DB_NAME
+        env:
+          DB_HOST: ${{ secrets.POSTGRES_HOST }}
+          DB_USER: ${{ secrets.POSTGRES_USER }}
+          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DB_NAME: ${{ secrets.POSTGRES_DB }}
+
+      # Run integration tests
+      - name: Run integration tests
+        run: npm test
+
