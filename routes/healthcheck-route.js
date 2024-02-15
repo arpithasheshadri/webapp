@@ -3,6 +3,8 @@ import express from "express";
 
 const router = express.Router();
 
+
+router.route("/").head(healthCheckController.methodCheck);
 router.route("/").get(healthCheckController.healthCheck);
 router.route("/").all(healthCheckController.methodCheck);
 
