@@ -37,7 +37,7 @@ app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
 });
 
-export default sequelize;
+export default app;
 
 // Resources used -
 // https://stackoverflow.com/questions/60647282/how-to-consume-json-in-express-js
