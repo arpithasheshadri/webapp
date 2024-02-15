@@ -1,53 +1,44 @@
-name: Integration Testing
-
+name: integration testing api
 on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
 
 jobs:
-  integration-test:
-    runs-on: ubuntu-latest
-    
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: Arpitha
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: cloud_arpitha
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    api-test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [20.x]
+        services:
+            postgres:
+                image: postgres
+                env:
+                    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+                    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+                    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+                ports:
+                    - 5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        steps:
+            - uses: actions/checkout@v2
 
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      
-      - name: Install Dependencies
-        run: npm install
-      
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          timeout=60
-          until pg_isready -h localhost -p 5432 -U postgres; do
-            timeout=$(($timeout - 1))
-            if [ $timeout -eq 0 ]; then
-              echo "PostgreSQL not ready, exiting..."
-              exit 1
-            fi
-            sleep 1
-          done
-      
-      - name: Run Integration Tests
-        run: npm run test
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: API testing
+              run: npm test
+              env:
+                  USER: ${{ secrets.POSTGRES_USER }}
+                  HOST: ${{ secrets.POSTGRES_HOST }}
+                  DATABASE: ${{ secrets.POSTGRES_DB }}
+                  PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+                  PORT: ${{ secrets.POSTGRES_DB_PORT }}
+                  DATABASE_SYS: ${{ secrets.POSTGRES_DB_DIALECT }}
+                  SERVER_PORT: ${{ secrets.NODE_APP_PORT }}
