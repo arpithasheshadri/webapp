@@ -29,7 +29,7 @@ export const createUser = async (request, response) => {
                 account_updated: addedUser.account_updated
 
             }
-            setResponse(responseUser, response);
+            response.status(201).send(responseUser);
         }
     } catch (err) {
         if (err.name === 'SequelizeUniqueConstraintError') {
@@ -45,6 +45,8 @@ export const getUser = async (request, response) => {
         const auth = request.headers.authorization;
         if (!auth || Object.keys(auth).length === 0) {
             setErrorResponse(400, "Authentication credentials required", response);
+        } else if(Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0) {
+            setErrorResponse(400, "Request body should not be sent", response);
         } else {
             const authenticatedUser = await authentication(auth);
             if (authenticatedUser) {
