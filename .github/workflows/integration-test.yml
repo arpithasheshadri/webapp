@@ -11,16 +11,16 @@ jobs:
         strategy:
             matrix:
                 node-version: [20.x]
-        services:
-            postgres:
-                image: postgres
-                env:
-                    POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-                    POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-                    POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-                ports:
-                    - 5432:5432
-                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        # services:
+        #     postgres:
+        #         image: postgres
+        #         env:
+        #             POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        #             POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        #             POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        #         ports:
+        #             - 5432:5432
+        #         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         steps:
             - uses: actions/checkout@v2
 
@@ -31,6 +31,19 @@ jobs:
 
             - name: Install Dependencies
               run: npm ci
+
+            # Install PostgreSQL client (e.g., psql)
+            - name: Install PostgreSQL client
+              run: sudo apt-get install -y postgresql-client
+
+            # Set up PostgreSQL connection using secrets
+            - name: Configure PostgreSQL connection
+              run: |
+                export PGHOST=${{ secrets.POSTGRES_HOST }}
+                export PGUSER=${{ secrets.POSTGRES_USER }}
+                export PGPASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+                export PGDATABASE=${{ secrets.POSTGRES_DB }}
+
 
             - name: API testing
               run: npm test
