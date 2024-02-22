@@ -4,7 +4,7 @@ sudo cp /tmp/webapp.zip /opt/
 cd /opt/ || exit
 sudo unzip webapp.zip
 
-
+cd /opt/webapp/
 sudo cp /tmp/development.env /opt/webapp/
 
 sudo chmod -R 750 /opt/
