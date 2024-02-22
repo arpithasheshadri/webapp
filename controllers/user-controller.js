@@ -7,19 +7,22 @@ import { validate } from "./validation.js";
 export const createUser = async (request, response) => {
     try {
         const isValid = validate(request.body);
+        console.log("inside first try",request.body);
         if (!isValid.isValid) {
             setErrorResponse(isValid.errors?.code, isValid.errors,response)
         } else {
             const salt = await bcrypt.genSalt(10);
             const hpassword = await bcrypt.hash(request.body.password, salt);
-
+            
             let user = {
                 username: request.body.username,
                 password: hpassword,
                 first_name: request.body.first_name,
                 last_name: request.body.last_name
             }
+            console.log("created user body",user);
             const addedUser = await addUser(user);
+            console.log("response",addedUser);
             let responseUser = {
                 id: addedUser.id,
                 username: addedUser.username,
@@ -35,6 +38,7 @@ export const createUser = async (request, response) => {
         if (err.name === 'SequelizeUniqueConstraintError') {
             setErrorResponse(400, "Username (or) Email already exists", response);
         } else {
+            console.error(err);
             setErrorResponse(503, err, response);
         }
     }
