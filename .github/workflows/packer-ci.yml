@@ -1,0 +1,32 @@
+name: Packer ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  packer-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Packer
+      uses: hashicorp/setup-packer@v0.2.0
+
+    - name: Format Packer template
+      run: packer fmt -check .
+
+    - name: Validate Packer template
+      run: packer validate .
+
+    - name: Check for changes
+      id: git-check
+      run: echo ::set-output name=changed::$(git status --porcelain)
+
+    - name: Fail if Packer template changed
+      if: steps.git-check.outputs.changed
+      run: exit 1
