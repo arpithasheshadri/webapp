@@ -1,13 +1,13 @@
 #!/bin/bash
 
-sudo cp /tmp/webapp.zip /opt
-cd /opt || exit
+sudo cp /tmp/webapp.zip /opt/
+cd /opt/ || exit
 sudo unzip webapp.zip
 
 
 sudo cp /tmp/development.env /opt/webapp
 
-sudo chmod -R 750 /opt
+sudo chmod -R 750 /opt/
 # Install Node.js and npm
 sudo npm install
 
