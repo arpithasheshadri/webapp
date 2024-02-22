@@ -13,7 +13,7 @@ echo "Current user1: $USER"
 # cd /opt/webapp
 # echo pwd
 
-sudo -u csye6225 '
+sudo -u csye6225 bash
 sudo chmod -R 750 /opt &&
 sudo cp /tmp/webapp.zip /opt/ &&
 cd /opt || exit &&
@@ -23,7 +23,7 @@ echo "$PWD" &&
 sudo cp /tmp/development.env /opt/webapp &&
 cd /opt/webapp &&
 echo "$PWD"
-'
+
 
 
 # Install Node.js and npm
