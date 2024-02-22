@@ -1,4 +1,4 @@
-name: Packer ci
+name: Packer CI
 
 on:
   push:
@@ -6,27 +6,59 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
-  packer-check:
+  packer_ci:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Check out code
+      uses: actions/checkout@v3
+    
+    
+    - name: Zip all the webApp files
+      run: |
+          zip -r webapp.zip ./
+          pwd
 
-    - name: Setup Packer
-      uses: hashicorp/setup-packer@v0.2.0
+    - name: Setup gcloud CLI
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        version: 'latest'
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
 
+    - name: Setup Environment File
+      run: |
+          cat << EOF > .env
+          SERVER_PORT=${{ secrets.SERVER_PORT }}
+          DATABASE=${{ secrets.DATABASE }}
+          DATABASE_SYS=${{ secrets.DATABASE_SYS }}
+          PORT=${{ secrets.PORT }}
+          HOST=${{ secrets.HOST }}
+          PASSWORD=${{ secrets.PASSWORD }}
+          USER=${{ secrets.USER }}
+          EOF
+      shell: bash
+
+
+    - name: Install Packer
+      run: |
+            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            sudo apt-get update && sudo apt-get install packer
+    - name: Initialize Packer
+      run: packer init .
+
+  
+
+    
     - name: Format Packer template
-      run: packer fmt -check .
-
+      run: |
+        packer fmt -check -diff .
+        if [ $? -ne 0 ]; then
+          echo "Packer templates need formatting. Run 'packer fmt' locally and push the changes."
+          exit 1
+        fi
     - name: Validate Packer template
       run: packer validate .
-
-    - name: Check for changes
-      id: git-check
-      run: echo ::set-output name=changed::$(git status --porcelain)
-
-    - name: Fail if Packer template changed
-      if: steps.git-check.outputs.changed
-      run: exit 1
