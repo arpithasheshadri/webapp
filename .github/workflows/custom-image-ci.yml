@@ -36,13 +36,13 @@ jobs:
     - name: Setup Environment File
       run: |
           cat << EOF > development.env
-          SERVER_PORT=${{ secrets.SERVER_PORT }}
-          DATABASE=${{ secrets.DATABASE }}
-          DATABASE_SYS=${{ secrets.DATABASE_SYS }}
-          PORT=${{ secrets.PORT }}
-          HOST=${{ secrets.HOST }}
-          PASSWORD=${{ secrets.PASSWORD }}
-          USER=${{ secrets.USER }}
+          SERVER_PORT=${{ secrets.NODE_APP_PORT }}
+          DATABASE=${{ secrets.POSTGRES_DB }}
+          DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}
+          PORT=${{ secrets.POSTGRES_DB_PORT }}
+          HOST=${{ secrets.POSTGRES_HOST }}
+          PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          USER=${{ secrets.POSTGRES_USER }}
           EOF
       shell: bash
 
