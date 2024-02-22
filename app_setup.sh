@@ -1,28 +1,25 @@
 #!/bin/bash
 
-echo "Current user1: $USER"
-# su csye6225
-# echo "Current user2: $USER"
-# sudo chmod -R 750 /opt
-# sudo cp /tmp/webapp.zip /opt/
-# cd /opt || exit
-# sudo unzip webapp.zip -d /opt/webapp
-# sudo ls -la
-# echo pwd
-# sudo cp /tmp/development.env /opt/webapp
-# cd /opt/webapp
-# echo pwd
-
 sudo -u csye6225 bash
-sudo chmod -R 750 /opt &&
-sudo cp /tmp/webapp.zip /opt/ &&
-cd /opt || exit &&
-sudo unzip webapp.zip -d /opt/webapp &&
-sudo ls -la &&
-echo "$PWD" &&
-sudo cp /tmp/development.env /opt/webapp &&
-cd /opt/webapp &&
-echo "$PWD"
+# sudo chmod -R 755 /opt
+sudo cp /tmp/webapp.zip /opt/
+cd /opt || exit
+sudo unzip webapp.zip -d /opt/webapp
+sudo ls -la
+echo $pwd
+sudo cp /tmp/development.env /opt/webapp
+cd /opt/webapp
+echo $pwd
+
+# sudo chmod -R 755 /opt &&
+# sudo cp /tmp/webapp.zip /opt/ &&
+# cd /opt || exit &&
+# sudo unzip webapp.zip -d /opt/webapp &&
+# sudo ls -la &&
+# echo "$PWD" &&
+# sudo cp /tmp/development.env /opt/webapp &&
+# cd /opt/webapp &&
+# echo "$PWD"
 
 
 
