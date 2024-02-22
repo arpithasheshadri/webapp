@@ -29,7 +29,7 @@ jobs:
 
     - name: Setup Environment File
       run: |
-          cat << EOF > .env
+          cat << EOF > development.env
           SERVER_PORT=${{ secrets.SERVER_PORT }}
           DATABASE=${{ secrets.DATABASE }}
           DATABASE_SYS=${{ secrets.DATABASE_SYS }}
