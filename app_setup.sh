@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo chmod -R 750 /opt
+sudo chmod -R 755 /opt
 sudo cp /tmp/webapp.zip /opt/
 cd /opt || exit
 sudo unzip webapp.zip -d /opt/webapp
