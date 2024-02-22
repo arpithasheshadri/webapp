@@ -1,6 +1,6 @@
 [Unit]
 Description=CSYE 6225 webapp
-ConditionPathExists=/opt/webapp-main/index.js
+ConditionPathExists=/opt/webapp/index.js
 After=network.target
 
 [Service]
@@ -8,8 +8,8 @@ Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt
-EnvironmentFile=/opt/webapp-main/development.env
-ExecStart=/usr/bin/node /opt/webapp-main/index.js
+EnvironmentFile=/opt/webapp/development.env
+ExecStart=/usr/bin/node /opt/webapp/index.js
 Restart=on-failure
 RestartSec=3
 StandardOutput=syslog
