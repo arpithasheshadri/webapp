@@ -24,25 +24,30 @@ jobs:
         # Zip the entire repository
         zip -r webapp.zip .
 
-    - name:  create env file
+    - name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0.4.0'
+      with: 
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+
+    - name: Setup Environment File
       run: |
-          echo "export SERVER_PORT=${{ secrets.SERVER_PORT }}" >> ~/development.env
-          echo "export DATABASE=${{ secrets.DATABASE }}" >> ~/development.env
-          echo "export DATABASE_SYS=${{ secrets.DATABASE_SYS }}" >> ~/development.env
-          echo "export PORT=${{ secrets.PORT }}" >> ~/development.env
-          echo "export HOST=${{ secrets.HOST }}" >> ~/development.env
-          echo "export PASSWORD=${{ secrets.PASSWORD }}" >> ~/development.env
-          echo "export USER=${{ secrets.USER }}" >> ~/development.env
+          cat << EOF > development.env
+          SERVER_PORT=${{ secrets.SERVER_PORT }}
+          DATABASE=${{ secrets.DATABASE }}
+          DATABASE_SYS=${{ secrets.DATABASE_SYS }}
+          PORT=${{ secrets.PORT }}
+          HOST=${{ secrets.HOST }}
+          PASSWORD=${{ secrets.PASSWORD }}
+          USER=${{ secrets.USER }}
+          EOF
+      shell: bash
 
-    - name: Setup Packer
-      uses: hashicorp/setup-packer@v0.2.0
-
-    - name: Setup gcloud CLI
-      uses: google-github-actions/setup-gcloud@master
-      with:
-        version: 'latest'
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
+    - name: Install Packer
+      run: |
+            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            sudo apt-get update && sudo apt-get install packer
 
     - name: Initiate Packer template
       run: packer init .
