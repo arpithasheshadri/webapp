@@ -12,7 +12,7 @@ source "googlecompute" "webapp-packer" {
   source_image_family = "centos-stream-8"
   image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
   ssh_username        = "packer"
-  zone                = "us-east1-b"
+     zone                = "us-east1-b"
 }
 
 build {
