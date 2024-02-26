@@ -10,9 +10,9 @@ packer {
 source "googlecompute" "webapp-packer" {
   project_id          = "cloud-gcp-tf"
   source_image_family = "centos-stream-8"
-  image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
-  ssh_username        = "packer"
-     zone                = "us-east1-b"
+  image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}",
+  ssh_username        = "packer",
+  zone                = "us-east1-b"
 }
 
 build {
