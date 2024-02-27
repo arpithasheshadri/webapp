@@ -1,6 +1,6 @@
 [Unit]
 Description=CSYE 6225 webapp
-ConditionPathExists=/opt/webapp/development.env
+ConditionPathExists=/opt/webapp/
 After=network.target
 
 [Service]
