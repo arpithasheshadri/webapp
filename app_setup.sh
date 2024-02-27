@@ -4,9 +4,10 @@ sudo chmod -R 755 /opt
 sudo cp /tmp/webapp.zip /opt/
 cd /opt || exit
 sudo unzip webapp.zip -d /opt/webapp
+sudo chown -R csye6225:csye6225 /opt/webapp
 sudo ls -la
 echo pwd
-sudo cp /tmp/development.env /opt/webapp
+# sudo cp /tmp/development.env /opt/webapp
 cd /opt/webapp
 echo pwd
 
