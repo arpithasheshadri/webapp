@@ -22,3 +22,4 @@ sudo systemctl start httpd
 sudo systemctl enable csye6225
 sudo systemctl start csye6225
 sudo systemctl status csye6225
+journalctl -xe
