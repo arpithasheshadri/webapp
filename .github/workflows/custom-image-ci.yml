@@ -1,6 +1,8 @@
 on:
-  pull_request:
-    types: [ closed ]
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
 
 
 jobs:
@@ -31,18 +33,18 @@ jobs:
         credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
 
-    - name: Setup Environment File
-      run: |
-          cat << EOF > development.env
-          SERVER_PORT=${{ secrets.NODE_APP_PORT }}
-          DATABASE=${{ secrets.POSTGRES_DB }}
-          DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}
-          PORT=${{ secrets.POSTGRES_DB_PORT }}
-          HOST=${{ secrets.POSTGRES_HOST }}
-          PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          USER=${{ secrets.POSTGRES_USER }}
-          EOF
-      shell: bash
+    # - name: Setup Environment File
+    #   run: |
+    #       cat << EOF > development.env
+    #       SERVER_PORT=${{ secrets.NODE_APP_PORT }}
+    #       DATABASE=${{ secrets.POSTGRES_DB }}
+    #       DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}
+    #       PORT=${{ secrets.POSTGRES_DB_PORT }}
+    #       HOST=${{ secrets.POSTGRES_HOST }}
+    #       PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+    #       USER=${{ secrets.POSTGRES_USER }}
+    #       EOF
+    #   shell: bash
 
     - name: Install Packer
       run: |
