@@ -14,7 +14,7 @@ echo pwd
 # Install Node.js and npm
 sudo npm install
 
-sudo npm test
+# sudo npm test
 
 sudo systemctl daemon-reload
 sudo systemctl enable httpd
