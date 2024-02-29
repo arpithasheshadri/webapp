@@ -1,6 +1,7 @@
 import supertest from 'supertest';
 import app from '../index.js';
 import {expect} from 'chai';
+import sequelize from '../db/sequelize.js';
 
 const request = supertest(app);
 
