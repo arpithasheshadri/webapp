@@ -6,6 +6,10 @@ const request = supertest(app);
 
 describe('User /v1/user API Integration Tests', () => {
 
+  before(async () => {
+    await sequelize.sync({ force: false, alter:true }); 
+  });
+
   // Test 1: Create an account and validate it exists
   it('create an account and validate the created account', async () => {
     const newUser = {
