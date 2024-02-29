@@ -5,10 +5,9 @@ import {expect} from 'chai';
 
 const request = supertest(app);
 
+
 describe('User /v1/user API Integration Tests', () => {
-  setTimeout(() => {
-    console.log("Delayed for 1 second.");
-  }, 3000);
+  
 
   // Test 1: Create an account and validate it exists
   it('create an account and validate the created account', async () => {

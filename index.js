@@ -22,16 +22,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(bodyParser.raw({type: '*/*'}));
 
-
+try {
+  await sequelize.sync({ force: false, alter: true });
+  console.log('Database synchronization successful.');
+} catch( err ) {
+  console.error('Error syncing the database:', err);
+}
 
 Router(app);
-sequelize.sync({ force: false, alter:true })
-    .then(() => {
-        console.log('Database synchronization successful.');
-    })
-    .catch(err => {
-        console.error('Database synchronization failed:', err);
-    });
+
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
