@@ -1,19 +1,14 @@
 import supertest from 'supertest';
 import app from '../index.js';
 import {expect} from 'chai';
-import sequelize from '../db/sequelize.js';
+// import sequelize from '../db/sequelize.js';
 
 const request = supertest(app);
 
 describe('User /v1/user API Integration Tests', () => {
-  before(async () => {
-    try {
-      await sequelize.sync({ force: false, alter: true }); // Ensure the database is synced before tests
-      console.log('Database synchronization successful.');
-    } catch (error) {
-      console.error('Database synchronization failed:', error);
-    }
-  });
+  setTimeout(() => {
+    console.log("Delayed for 1 second.");
+  }, "3000");
 
   // Test 1: Create an account and validate it exists
   it('create an account and validate the created account', async () => {
