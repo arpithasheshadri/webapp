@@ -5,11 +5,12 @@ import sequelize from '../db/sequelize.js';
 
 const request = supertest(app);
 
-describe('User /v1/user API Integration Tests', () => {
+before(async () => {
+  // Wait for the database synchronization to complete before running tests
+  await sequelize.sync({ force: false, alter:true });
+});
 
-  before(async () => {
-    await sequelize.sync({ force: false, alter:true }); 
-  });
+describe('User /v1/user API Integration Tests', () => {
 
   // Test 1: Create an account and validate it exists
   it('create an account and validate the created account', async () => {
