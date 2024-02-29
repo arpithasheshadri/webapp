@@ -9,13 +9,16 @@ import sequelize from './db/sequelize.js';
 
 const app = express();
 
-sequelize.sync({ force: false, alter:true })
-    .then(() => {
-        console.log('Database synchronization successful.');
-    })
-    .catch(err => {
-        console.error('Database synchronization failed:', err);
-    });
+sequelize.sync({ force: false, alter: true })
+  .then(() => {
+    console.log('Database synchronization successful.');
+    startServer();
+  })
+  .catch(err => {
+    console.error('Database synchronization failed:', err);
+  });
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,6 +28,8 @@ dotenv.config({
 });
 
 
+function startServer() {
+  
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.text());
@@ -33,11 +38,14 @@ app.use(bodyParser.raw({type: '*/*'}));
 
 
 Router(app);
+  app.listen(process.env.SERVER_PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
+  });
+}
 
-
-app.listen(process.env.SERVER_PORT, () => {
-  console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
-});
+// app.listen(process.env.SERVER_PORT, () => {
+//   console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
+// });
 
 export default app;
 
