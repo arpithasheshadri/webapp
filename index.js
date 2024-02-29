@@ -9,6 +9,14 @@ import sequelize from './db/sequelize.js';
 
 const app = express();
 
+sequelize.sync({ force: false, alter:true })
+    .then(() => {
+        console.log('Database synchronization successful.');
+    })
+    .catch(err => {
+        console.error('Database synchronization failed:', err);
+    });
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({
@@ -25,13 +33,7 @@ app.use(bodyParser.raw({type: '*/*'}));
 
 
 Router(app);
-sequelize.sync({ force: false, alter:true })
-    .then(() => {
-        console.log('Database synchronization successful.');
-    })
-    .catch(err => {
-        console.error('Database synchronization failed:', err);
-    });
+
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
