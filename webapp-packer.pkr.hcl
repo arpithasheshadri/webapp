@@ -30,7 +30,7 @@ build {
   provisioner "shell" {
     script = "./os_update.sh"
   }
-  
+
   provisioner "shell" {
     script = "./user-creation.sh"
   }
