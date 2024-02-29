@@ -46,9 +46,9 @@ jobs:
                 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $PG_USER TO $PG_USER;" 2>/dev/null
 
 
-            - name: Update pg_hba.conf to use password authentication
-              run: |
-                sudo sed -i "s/ident/md5/g" /etc/postgresql/<version>/main/pg_hba.conf
+            # - name: Update pg_hba.conf to use password authentication
+            #   run: |
+            #     sudo sed -i "s/ident/md5/g" /etc/postgresql/<version>/main/pg_hba.conf
 
 
             - name: Install Dependencies
