@@ -13,9 +13,14 @@ sudo systemctl start postgresql
 sudo systemctl enable postgresql
 
 # Create a new user and database in PostgreSQL
-sudo -u postgres psql -c "CREATE USER cloud_arpitha WITH PASSWORD 'postgres';" 2>/dev/null
-sudo -u postgres psql -c "CREATE DATABASE cloud_arpitha OWNER cloud_arpitha;" 2>/dev/null
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE cloud_arpitha TO cloud_arpitha;" 2>/dev/null
+# sudo -u postgres psql -c "CREATE USER cloud_arpitha WITH PASSWORD 'postgres';" 2>/dev/null
+# sudo -u postgres psql -c "CREATE DATABASE cloud_arpitha OWNER cloud_arpitha;" 2>/dev/null
+# sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE cloud_arpitha TO cloud_arpitha;" 2>/dev/null
+# sudo sed -i "s/ident/md5/g" /var/lib/pgsql/data/pg_hba.conf
+
+sudo -u postgres psql -c "CREATE USER $USER WITH PASSWORD '$PASSWORD';" 2>/dev/null
+sudo -u postgres psql -c "CREATE DATABASE $USER OWNER $USER;" 2>/dev/null
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $USER TO $USER;" 2>/dev/null
 sudo sed -i "s/ident/md5/g" /var/lib/pgsql/data/pg_hba.conf
 
 # Configure PostgreSQL to allow connections from external hosts (if needed)
