@@ -28,6 +28,20 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: ${{ matrix.node-version }}
+            
+            - name: Set up environment
+              run: |
+                export USER="${{ secrets.POSTGRES_USER }}" 
+                export HOST="${{ secrets.POSTGRES_HOST }}"
+                export DATABASE="${{ secrets.POSTGRES_DB }}"
+                export PASSWORD="${{ secrets.POSTGRES_PASSWORD }}"
+                export PORT="${{ secrets.POSTGRES_DB_PORT }}"
+                export DATABASE_SYS="${{ secrets.POSTGRES_DB_DIALECT }}"
+                export SERVER_PORT="${{ secrets.NODE_APP_PORT }}"
+
+            - name: Install postgres
+              run: |
+                bash ./postgres_setup.sh
 
             - name: Install Dependencies
               run: npm ci
