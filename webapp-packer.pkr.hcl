@@ -26,16 +26,11 @@ build {
     source      = "./csye6225.service"
     destination = "/tmp/csye6225.service"
   }
-  // provisioner "file" {
-  //   source      = "./development.env"
-  //   destination = "/tmp/development.env"
-  // }
+
   provisioner "shell" {
     script = "./os_update.sh"
   }
-  // provisioner "shell" {
-  //   script = "./postgres_setup.sh"
-  // }
+  
   provisioner "shell" {
     script = "./user-creation.sh"
   }
