@@ -1,5 +1,6 @@
 import { addUser } from "../services/user-service.js";
 import { setResponse, setErrorResponse } from "./response-handler.js";
+import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import { authentication } from "./authentication.js";
 import { validate } from "./validation.js";
@@ -15,6 +16,7 @@ export const createUser = async (request, response) => {
             const hpassword = await bcrypt.hash(request.body.password, salt);
             
             let user = {
+                id: uuidv4(),
                 username: request.body.username,
                 password: hpassword,
                 first_name: request.body.first_name,
