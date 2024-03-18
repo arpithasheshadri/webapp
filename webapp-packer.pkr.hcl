@@ -37,6 +37,11 @@ build {
   provisioner "shell" {
     script = "./node_setup.sh"
   }
+
+  provisioner "shell" {
+    script = "./ops_agent_setup.sh"
+  }
+
   provisioner "shell" {
     script = "./app_setup.sh"
   }
