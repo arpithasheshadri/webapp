@@ -3,7 +3,10 @@ import { setResponse, setErrorResponse } from "./response-handler.js";
 import logger from "./logger.js";
 
 export const healthCheck = async (request, response) => {
-    logger.info("Healthcheck started");
+    logger.info({
+        message: "Healthcheck started",
+        severity: 'INFO'
+      });
     response.set('Cache-Control', 'no-cache');
     try {
         if(Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0){
