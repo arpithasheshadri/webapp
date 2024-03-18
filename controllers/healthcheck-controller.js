@@ -3,27 +3,27 @@ import { setResponse, setErrorResponse } from "./response-handler.js";
 import logger from "./logger.js";
 
 export const healthCheck = async (request, response) => {
-    logger.info("Healthcheck started");
+    logger.info("Healthcheck started",{ severity: 'INFO' });
     response.set('Cache-Control', 'no-cache');
     try {
         if(Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0){
-            logger.error("request body (or) request parameter should not be sent");
+            logger.error("request body (or) request parameter should not be sent",{ severity: 'ERROR' });
             response.status(400).send();
         } else {
             await checkConnection();
-            logger.info("Healthcheck successful");
-            logger.info("Healthcheck completed");
+            logger.info("Healthcheck successful",{ severity: 'INFO' });
+            logger.info("Healthcheck completed",{ severity: 'INFO' });
             response.status(200).send();
         }
     } catch (err) {
-        logger.error(`Healthcheck Failed : ${err}`);
+        logger.error(`Healthcheck Failed : ${err}`,{ severity: 'ERROR' });
         setErrorResponse(503, err, response);
     }
 }
 
 export const methodCheck = async (request, response) => {
     response.set('Cache-Control', 'no-cache');
-    logger.error(`Healthcheck Failed : Requested method not allowed`);
+    logger.error(`Healthcheck Failed : Requested method not allowed`,{ severity: 'ERROR' });
     response.status(405).send();
 }
 

@@ -17,18 +17,12 @@ logging:
       type: parse_json
       time_key: time
       time_format: "YYYY-MM-DDTHH:MM:SS.sssZ"
+      severity_key: severity
   service:
     pipelines:
       default_pipeline:
         receivers: [my-app-receiver]
         processors: [my-app-processor]
-severity:
-  levels:
-    error: ERROR
-    warning: WARNING
-    info: INFO
-    debug: DEBUG
-    trace: DEFAULT
 EOF
 )
 
