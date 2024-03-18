@@ -17,6 +17,11 @@ logging:
       type: parse_json
       time_key: time
       time_format: "YYYY-MM-DDTHH:MM:SS.sssZ"
+    modify_fields:
+      type: modify_fields
+      fields:
+        severity:
+          copy_from: jsonPayload.severity
   service:
     pipelines:
       default_pipeline:
