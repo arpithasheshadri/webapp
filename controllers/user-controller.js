@@ -7,11 +7,11 @@ import { validate } from "./validation.js";
 import logger from "./logger.js";
 
 export const createUser = async (request, response) => {
-    logger.info("User creation started");
+    logger.info("User creation started",{ severity: 'INFO' });
     try {
         const isValid = validate(request.body);
         if (!isValid.isValid) {
-            logger.error(`Error occured while creating user : ${isValid.errors.message}`);
+            logger.error(`Error occured while creating user : ${isValid.errors.message}`,{ severity: 'ERROR' });
             setErrorResponse(isValid.errors?.code, isValid.errors,response)
         } else {
             const salt = await bcrypt.genSalt(10);
@@ -34,29 +34,29 @@ export const createUser = async (request, response) => {
                 account_updated: addedUser.account_updated
 
             }
-            logger.info("User creation successful");
+            logger.info("User creation successful",{ severity: 'INFO' });
             response.status(201).send(responseUser);
         }
     } catch (err) {
         if (err.name === 'SequelizeUniqueConstraintError') {
-            logger.error(`Error occured while creating user : Username (or) Email already exists`);
+            logger.error(`Error occured while creating user : Username (or) Email already exists`,{ severity: 'ERROR' });
             setErrorResponse(400, "Username (or) Email already exists", response);
         } else {
-            logger.error(`Error occured while creating user : ${err}`);
+            logger.error(`Error occured while creating user : ${err}`,{ severity: 'ERROR' });
             setErrorResponse(503, err, response);
         }
     }
 }
 
 export const getUser = async (request, response) => {
-    logger.info("Fetching user started");
+    logger.info("Fetching user started",{ severity: 'INFO' });
     try {
         const auth = request.headers.authorization;
         if (!auth || Object.keys(auth).length === 0) {
-            logger.error(`Error occured while fetching user : Authentication credentials required`);
+            logger.error(`Error occured while fetching user : Authentication credentials required`,{ severity: 'ERROR' });
             setErrorResponse(400, "Authentication credentials required", response);
         } else if(Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0) {
-            logger.error(`Error occured while fetching user : Request body should not be sent`);
+            logger.error(`Error occured while fetching user : Request body should not be sent`,{ severity: 'ERROR' });
             setErrorResponse(400, "Request body should not be sent", response);
         } else {
             const authenticatedUser = await authentication(auth);
@@ -69,21 +69,21 @@ export const getUser = async (request, response) => {
                     account_created: authenticatedUser.account_created,
                     account_updated: authenticatedUser.account_updated
                 }
-                logger.info(`User fetched successfully`);
+                logger.info(`User fetched successfully`,{ severity: 'INFO' });
                 setResponse(user, response);
             } else {
-                logger.error(`Error occured while fetching user : Invalid credentials provided`);
+                logger.error(`Error occured while fetching user : Invalid credentials provided`,{ severity: 'ERROR' });
                 setErrorResponse(401, "Invalid credentials provided", response);
             }
         }
     } catch (err) {
-        logger.error(`Error occured while fetching user : ${err}`);
+        logger.error(`Error occured while fetching user : ${err}`,{ severity: 'ERROR' });
         setErrorResponse(503, err, response);
     }
 }
 
 export const updateUser = async (request, response) => {
-    logger.info("Updating user started");
+    logger.info("Updating user started",{ severity: 'INFO' });
     response.set('Cache-Control', 'no-cache');
     try {
         const { first_name, last_name, password } = request.body;
@@ -91,22 +91,22 @@ export const updateUser = async (request, response) => {
         if(!Object.values(request.body).every(val => {
             return typeof val === 'string' && val.trim() !== '' && val !== null;
         })){
-            logger.error("Error occured while updating user : Payload values should not be empty/null");
+            logger.error("Error occured while updating user : Payload values should not be empty/null",{ severity: 'ERROR' });
             setErrorResponse(400,"Payload values should not be empty/null",response);
         }
         else if(password && !passwordPattern.test(password)){
-            logger.error("Error occured while updating user : Password should be alphanumeric with special characters and at least 6 characters long");
+            logger.error("Error occured while updating user : Password should be alphanumeric with special characters and at least 6 characters long",{ severity: 'ERROR' });
             setErrorResponse(400,"Password should be alphanumeric with special characters and at least 6 characters long",response);
         } else {
             const allowedFields = ["first_name", "last_name", "password"];
             const invalidFields = Object.keys(request.body).filter(val => !allowedFields.includes(val));
             if (invalidFields.length > 0) {
-                logger.error(`Error occured while updating user : Invalid fields - ${invalidFields.join(', ')} to update`);
+                logger.error(`Error occured while updating user : Invalid fields - ${invalidFields.join(', ')} to update`,{ severity: 'ERROR' });
                 setErrorResponse(400, `Invalid fields - ${invalidFields.join(', ')} to update`, response);
             } else {
                 const auth = request.headers.authorization;
                 if (!auth || Object.keys(auth).length === 0) {
-                    logger.error(`Error occured while updating user : Authentication credentials required`);
+                    logger.error(`Error occured while updating user : Authentication credentials required`,{ severity: 'ERROR' });
                     setErrorResponse(400, "Authentication credentials required", response);
                 } else {
                     const authenticatedUser = await authentication(auth);
@@ -124,24 +124,24 @@ export const updateUser = async (request, response) => {
                         }
                         authenticatedUser.account_updated = new Date();
                         await authenticatedUser.save();
-                        logger.info("User updated successfully");
+                        logger.info("User updated successfully",{ severity: 'INFO' });
                         response.status(204).send();
                     } else {
-                        logger.error(`Error occured while updating user : Invalid credentials provided`);
+                        logger.error(`Error occured while updating user : Invalid credentials provided`,{ severity: 'ERROR' });
                         setErrorResponse(401, "Invalid credentials provided", response);
                     }
                 }
             }
         }
     } catch (err) {
-        logger.error(`Error occured while updating user : Service Unavailable`);
+        logger.error(`Error occured while updating user : Service Unavailable`,{ severity: 'ERROR' });
         setErrorResponse(503, "Service Unavailable", response);
     }
 }
 
 export const methodCheck = async (request, response) => {
     response.set('Cache-Control', 'no-cache');
-    logger.error(`Error occured while updating user : Requested method not allowed`);
+    logger.error(`Error occured while updating user : Requested method not allowed`,{ severity: 'ERROR' });
     response.status(405).send();
 }
 
