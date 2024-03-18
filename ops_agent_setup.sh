@@ -22,6 +22,13 @@ logging:
       default_pipeline:
         receivers: [my-app-receiver]
         processors: [my-app-processor]
+severity:
+  levels:
+    error: ERROR
+    warning: WARNING
+    info: INFO
+    debug: DEBUG
+    trace: DEFAULT
 EOF
 )
 
