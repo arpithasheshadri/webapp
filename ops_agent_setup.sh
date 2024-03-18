@@ -33,3 +33,6 @@ echo "$logging_config" | sudo tee -a /etc/google-cloud-ops-agent/config.yaml > /
 
 
 sudo systemctl restart google-cloud-ops-agent
+
+sudo touch /var/log/webapp.log
+sudo chown csye6225:csye6225 /var/log/webapp.log
