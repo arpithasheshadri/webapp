@@ -17,7 +17,6 @@ logging:
       type: parse_json
       time_key: time
       time_format: "YYYY-MM-DDTHH:MM:SS.sssZ"
-      severity_key: severity
   service:
     pipelines:
       default_pipeline:
