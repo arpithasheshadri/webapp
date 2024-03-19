@@ -7,13 +7,13 @@ sudo bash add-google-cloud-ops-agent-repo.sh --also-install
 logging_config=$(cat <<EOF
 logging:
   receivers:
-    my-app-receiver:
+    web-app-receiver:
       type: files
       include_paths:
         - /var/log/webapp.log
       record_log_file_path: true
   processors:
-    my-app-processor:
+    web-app-processor:
       type: parse_json
       time_key: time
       time_format: "YYYY-MM-DDTHH:MM:SS.sssZ"
@@ -25,15 +25,15 @@ logging:
   service:
     pipelines:
       default_pipeline:
-        receivers: [my-app-receiver]
-        processors: [my-app-processor,modify_fields]
+        receivers: [web-app-receiver]
+        processors: [web-app-processor,modify_fields]
 EOF
 )
 
-# Backup the original config file
+
 sudo cp /etc/google-cloud-ops-agent/config.yaml /etc/google-cloud-ops-agent/config.yaml.backup
 
-# Add the logging configuration to the config file
+
 echo "$logging_config" | sudo tee -a /etc/google-cloud-ops-agent/config.yaml > /dev/null
 
 
