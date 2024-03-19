@@ -10,7 +10,7 @@ logging:
     web-app-receiver:
       type: files
       include_paths:
-        - /var/log/webapp.log
+        - /var/log/webapp/webapp.log
       record_log_file_path: true
   processors:
     web-app-processor:
