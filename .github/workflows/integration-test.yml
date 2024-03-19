@@ -1,7 +1,7 @@
 name: integration testing api
 on:
-    push:
-        branches: [ "main" ]
+    # push:
+    #     branches: [ "main" ]
     pull_request:
         branches: [ "main" ]
 
