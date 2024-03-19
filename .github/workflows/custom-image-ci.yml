@@ -1,14 +1,11 @@
-# on:
-#   pull_request:
-#     types: [ closed ]
 on:
-    pull_request:
-        branches: [ "main" ]
+  pull_request:
+    types: [ closed ]
 
 
 jobs:
   build-and-deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
