@@ -1,8 +1,6 @@
 name: Packer CI
 
 on:
-  # push:
-  #   branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -20,25 +18,6 @@ jobs:
       run: |
           zip -r webapp.zip ./
           pwd
-
-    # - name: 'Authenticate to Google Cloud'
-    #   uses: 'google-github-actions/auth@v0.4.0'
-    #   with: 
-    #     credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
-
-    # - name: Setup Environment File
-    #   run: |
-    #       cat << EOF > development.env
-    #       SERVER_PORT=${{ secrets.SERVER_PORT }}
-    #       DATABASE=${{ secrets.DATABASE }}
-    #       DATABASE_SYS=${{ secrets.DATABASE_SYS }}
-    #       PORT=${{ secrets.PORT }}
-    #       HOST=${{ secrets.HOST }}
-    #       PASSWORD=${{ secrets.PASSWORD }}
-    #       USER=${{ secrets.USER }}
-    #       EOF
-    #   shell: bash
 
 
     - name: Install Packer

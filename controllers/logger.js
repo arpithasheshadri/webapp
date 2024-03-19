@@ -7,7 +7,7 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   transports: [
-    new winston.transports.File({ filename: '/var/log/webapp.log' })
+    new winston.transports.File({ filename: '/var/log/webapp/webapp.log' })
   ],
 });
 
