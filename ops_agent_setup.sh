@@ -26,7 +26,7 @@ logging:
     pipelines:
       default_pipeline:
         receivers: [my-app-receiver]
-        processors: [my-app-processor]
+        processors: [my-app-processor,modify_fields]
 EOF
 )
 
