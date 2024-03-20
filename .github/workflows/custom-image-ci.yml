@@ -1,11 +1,12 @@
 on:
   pull_request:
-    types: [ closed ]
+    branches: [ "main" ]
+    # types: [ closed ]
 
 
 jobs:
   build-and-deploy:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -40,9 +41,9 @@ jobs:
       run: packer init .
 
     - name: Validate Packer template
-      run: packer validate .
+      run: packer validate -var-file="variables.pkrvars.hcl" .
 
     - name: Build Packer template
-      run: packer build .
+      run: packer build -var-file="variables.pkrvars.hcl" .
 
     

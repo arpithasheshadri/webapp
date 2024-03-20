@@ -8,11 +8,11 @@ packer {
 }
 
 source "googlecompute" "webapp-packer" {
-  project_id          = "cloud-gcp-tf"
-  source_image_family = "centos-stream-8"
-  image_name          = "centos-stream-8-${formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())}"
-  ssh_username        = "packer"
-  zone                = "us-east1-b"
+  project_id          = var.project_id
+  source_image_family = var.source_image_family
+  image_name          = var.image_name
+  ssh_username        = var.ssh_username
+  zone                = var.zone
 }
 
 build {
