@@ -3,10 +3,6 @@ variable "project_id" {
   description = "Project ID"
 }
 
-variable "source_image_family" {
-  type        = string
-  description = "image family"
-}
 
 variable "image_name" {
   type        = string
