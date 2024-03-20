@@ -3,9 +3,9 @@ import { setResponse, setErrorResponse } from "./response-handler.js";
 import logger from "./logger.js";
 
 export const healthCheck = async (request, response) => {
-    logger.info({
+    logger.debug({
         message: "Healthcheck started",
-        severity: 'INFO'
+        severity: 'DEBUG'
       });
     response.set('Cache-Control', 'no-cache');
     try {
@@ -21,9 +21,9 @@ export const healthCheck = async (request, response) => {
                 message: "Healthcheck successful",
                 severity: 'INFO'
               });
-              logger.info({
+              logger.debug({
                 message: "Healthcheck completed",
-                severity: 'INFO'
+                severity: 'DEBUG'
               });
             response.status(200).send();
         }
@@ -37,6 +37,10 @@ export const healthCheck = async (request, response) => {
 }
 
 export const methodCheck = async (request, response) => {
+    logger.debug({
+        message: "Healthcheck started",
+        severity: 'DEBUG'
+      });
     response.set('Cache-Control', 'no-cache');
     logger.error({
         message: `Healthcheck Failed : Requested method not allowed`,
