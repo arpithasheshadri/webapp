@@ -1,9 +1,3 @@
-variable "project_id" {}
-variable "source_image_family" {}
-variable "image_name" {}
-variable "ssh_username" {}
-variable "zone" {}
-
 packer {
   required_plugins {
     googlecompute = {
