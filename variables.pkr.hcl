@@ -3,11 +3,12 @@ variable "project_id" {
   description = "Project ID"
 }
 
-
-variable "image_name" {
+variable "source_image_family" {
   type        = string
-  description = "image name"
+  description = "image family"
 }
+
+
 
 variable "ssh_username" {
   type        = string
