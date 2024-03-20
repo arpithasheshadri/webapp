@@ -7,9 +7,9 @@ import { validate } from "./validation.js";
 import logger from "./logger.js";
 
 export const createUser = async (request, response) => {
-    logger.info({
+    logger.debug({
         message: "User creation started",
-        severity: 'INFO'
+        severity: 'DEBUG'
       });
     try {
         const isValid = validate(request.body);
@@ -41,9 +41,13 @@ export const createUser = async (request, response) => {
 
             }
             logger.info({
-                message: "User creation successful",
+                message: `User creation successful - ${responseUser.username}`,
                 severity: 'INFO'
               });
+            logger.debug({
+            message: `User creation completef`,
+            severity: 'DEBUG'
+            });
             response.status(201).send(responseUser);
         }
     } catch (err) {
@@ -64,9 +68,9 @@ export const createUser = async (request, response) => {
 }
 
 export const getUser = async (request, response) => {
-    logger.info({
+    logger.debug({
         message: "Fetching user started",
-        severity: 'INFO'
+        severity: 'DEBUG'
       });
     try {
         const auth = request.headers.authorization;
@@ -94,9 +98,13 @@ export const getUser = async (request, response) => {
                     account_updated: authenticatedUser.account_updated
                 }
                 logger.info({
-                    message: `User fetched successfully`,
+                    message: `User fetched successfully - ${user.username}`,
                     severity: 'INFO'
                   });
+                logger.debug({
+                message: `User fetching completed`,
+                severity: 'DEBUG'
+                });
                 setResponse(user, response);
             } else {
                 logger.error({
@@ -116,14 +124,18 @@ export const getUser = async (request, response) => {
 }
 
 export const updateUser = async (request, response) => {
-    logger.info({
+    logger.debug({
         message: "Updating user started",
-        severity: 'INFO'
+        severity: 'DEBUG'
       });
     response.set('Cache-Control', 'no-cache');
     try {
         const { first_name, last_name, password } = request.body;
         const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{6,}$/;
+        logger.warn({
+            message: "Multiple nested if/else conditions exists, consider refactoring in future.",
+            severity: 'WARN'
+        });
         if(!Object.values(request.body).every(val => {
             return typeof val === 'string' && val.trim() !== '' && val !== null;
         })){
@@ -173,9 +185,13 @@ export const updateUser = async (request, response) => {
                         authenticatedUser.account_updated = new Date();
                         await authenticatedUser.save();
                         logger.info({
-                            message: "User updated successfully",
+                            message: `User updated successfully - ${authenticatedUser.username}`,
                             severity: 'INFO'
                           });
+                        logger.debug({
+                        message: `Update user completed`,
+                        severity: 'DEBUG'
+                        });
                         response.status(204).send();
                     } else {
                         logger.error({
@@ -197,6 +213,10 @@ export const updateUser = async (request, response) => {
 }
 
 export const methodCheck = async (request, response) => {
+    logger.debug({
+        message: "Updating user started",
+        severity: 'DEBUG'
+      });
     response.set('Cache-Control', 'no-cache');
     logger.error({
         message: `Error occured while updating user : Requested method not allowed`,

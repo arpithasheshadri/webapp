@@ -1,6 +1,10 @@
-
+import logger from "./logger";
 
 export const validate = (payload = {}) => {
+    logger.debug({
+        message: "Validating payload started",
+        severity: 'DEBUG'
+      });
     if (!payload || typeof payload !== 'object') {
         return {
             isValid: false,
@@ -14,6 +18,10 @@ export const validate = (payload = {}) => {
 
     const missingFields = requiredFields.filter(field => !payload.hasOwnProperty(field));
     if (missingFields.length > 0) {
+        logger.debug({
+            message: "Validating payload unsuccessful",
+            severity: 'DEBUG'
+          });
         return {
             isValid: false,
             errors: {
@@ -26,6 +34,10 @@ export const validate = (payload = {}) => {
 
     const hasExtraFields = Object.keys(extraFields).length > 0;
     if (hasExtraFields) {
+        logger.debug({
+            message: "Validating payload unsuccessful",
+            severity: 'DEBUG'
+          });
         return {
             isValid: false,
             errors: {
@@ -46,7 +58,10 @@ export const validate = (payload = {}) => {
     const isLastnameString = typeof last_name === 'string';
 
     const isValid = isEmail && isPasswordValid && isFirstnameString && isLastnameString;
-
+    logger.debug({
+        message: `Validating payload completed with status - ${isValid}`,
+        severity: 'DEBUG'
+      });
     return {
         isValid,
         errors: {
