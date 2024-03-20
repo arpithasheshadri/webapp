@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import bodyParser from 'body-parser';
 import sequelize from './db/sequelize.js';
+import logger from './controllers/logger.js';
 
 const app = express();
 
@@ -24,8 +25,16 @@ app.use(bodyParser.raw({type: '*/*'}));
 
 try {
   await sequelize.sync({ force: false, alter: true });
-  console.log('Database synchronization successful.');
+  logger.debug({
+    message: 'Database synchronization successful',
+    severity: 'DEBUG'
+  });
+  console.log('Database synchronization successful');
 } catch( err ) {
+  logger.error({
+    message: 'Database synchronization failed',
+    severity: 'ERROR'
+  });
   console.error('Error syncing the database:', err);
 }
 
@@ -33,6 +42,10 @@ Router(app);
 
 
 app.listen(process.env.SERVER_PORT, () => {
+  logger.debug({
+    message: `Application is up and running at port - ${process.env.SERVER_PORT}`,
+    severity: 'DEBUG'
+  });
   console.log(`Server is running on http://localhost:${process.env.SERVER_PORT}`);
 });
 
