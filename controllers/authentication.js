@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { fetchUser } from "../services/user-service.js";
+import logger from "./logger.js";
 
 export const authentication = async(auth = {}) => {
     logger.debug({
