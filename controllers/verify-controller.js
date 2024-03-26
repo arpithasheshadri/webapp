@@ -13,6 +13,10 @@ export const verifyUser = async (request, response) => {
         const user = userVerification(token);
         if(user){
             const curDate = Date.now();
+            logger.info({message: `curDate: ${curDate}, expiryTime: ${user.expiryTime}`,
+        severity: 'INFO'});
+            
+            console.log(user.expiryTime);
             if(curDate <= user.expiryTime){
                 const user = setVerification(user.email);
                 logger.info({
