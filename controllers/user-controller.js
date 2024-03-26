@@ -71,19 +71,20 @@ export const createUser = async (request, response) => {
                 let data = {
                     username: addedUser.username
                 }
+                console.log(data);
                 const sendData = JSON.stringify(data);
                 const dataBuffer = Buffer.from(sendData);
                 try {
                     const messageId = await pubsub
                         .topic(topicName)
-                        .publishMessage({ sendData: dataBuffer });
+                        .publishMessage({ data: dataBuffer });
                     logger.info({
                         message: `Message published: ${messageId}`,
                         severity: 'INFO'
                     })
                 } catch (error) {
                     logger.error({
-                        message: `Error occured while creating user : ${error.message}`,
+                        message: `Error occured while publishing message : ${error.message}`,
                         severity: 'ERROR'
                     });
                 }
