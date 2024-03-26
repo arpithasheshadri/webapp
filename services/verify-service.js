@@ -5,7 +5,7 @@ import { fetchUser } from "./user-service.js";
 
 export const userVerification = async (token) => {
     const user = await EmailTracking.findOne({ where: { token: token } });
-    return await user;
+    return user;
 }
 
 export const setVerification = async (email) => {
