@@ -3,6 +3,6 @@ import express from "express";
 
 const router = express.Router();
 
-router.route("/").post(verifyController.verifyUser);
+router.route("/").all(verifyController.verifyUser);
 
 export default router;
