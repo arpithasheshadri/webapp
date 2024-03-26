@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { BOOLEAN, DataTypes } from "sequelize";
 import sequelize from "../db/sequelize.js";
 
 const User = sequelize.define('User', {
@@ -35,6 +35,10 @@ const User = sequelize.define('User', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
     },
+    is_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
 }, {
     timestamps: false,
   });
