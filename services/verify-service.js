@@ -1,12 +1,10 @@
 import sequelize from "../db/sequelize.js";
 import User from "../models/User.js";
+import EmailTracking from "../models/EmailTracking.js";
 import { fetchUser } from "./user-service.js";
 
 export const userVerification = async (token) => {
-    const user = await sequelize.query('SELECT "email","expiryTime" FROM "email_tracking" WHERE "email_tracking"."token" = (:id)', {
-        replacements: {id: token},
-        type: sequelize.QueryTypes.SELECT
-      });
+    const user = await EmailTracking.findOne({ where: { token: token } });
     return await user;
 }
 
