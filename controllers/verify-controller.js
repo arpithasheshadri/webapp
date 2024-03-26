@@ -15,9 +15,11 @@ export const verifyUser = async (request, response) => {
             const curDate = Date.now();
             logger.info({message: `curDate: ${curDate}, expiryTime: ${user.expiryTime}`,
         severity: 'INFO'});
+            const dbDate = new Date((user.expiryTime).toString()).getTime();
             
-            console.log(user.expiryTime);
-            if(curDate <= user.expiryTime){
+            logger.info({message: `dbDate: ${dbDate}, expiryTime: ${user.expiryTime}`,
+        severity: 'INFO'});
+            if(curDate <= dbDate){
                 const user = setVerification(user.email);
                 logger.info({
                     message: "User verification successful",
