@@ -12,7 +12,7 @@ export const verifyUser = async (request, response) => {
     try {
         const user = userVerification(token);
         if(user){
-            const curDate = new Date.now();
+            const curDate = Date.now();
             if(curDate <= user.expiryTime){
                 const user = setVerification(user.email);
                 logger.info({
@@ -32,7 +32,7 @@ export const verifyUser = async (request, response) => {
         
     } catch (err) {
         logger.error({
-            message: `Healthcheck Failed : ${err}`,
+            message: `Verification Failed : ${err}`,
             severity: 'ERROR'
           });
         setErrorResponse(503, err, response);
