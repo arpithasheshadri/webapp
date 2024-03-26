@@ -47,3 +47,4 @@ jobs:
                   PORT: ${{ secrets.POSTGRES_DB_PORT }}
                   DATABASE_SYS: ${{ secrets.POSTGRES_DB_DIALECT }}
                   SERVER_PORT: ${{ secrets.NODE_APP_PORT }}
+                  APP_ENV: ${{ secrets.APP_ENV}}
