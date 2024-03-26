@@ -1,3 +1,6 @@
+import { BOOLEAN, DataTypes } from "sequelize";
+import sequelize from "../db/sequelize.js";
+
 const EmailTracking = sequelize.define('email_tracking', {
     email: {
       type: DataTypes.STRING,
