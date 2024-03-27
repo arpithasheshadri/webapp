@@ -17,20 +17,21 @@ export const verifyUser = async (request, response) => {
             const curDate = Date.now();
             logger.info({message: `token: ${token}, curDate: ${curDate}, expiryTime: ${user.expiryTime}`,
             severity: 'INFO'});
-            // const dbDate = new Date((user.expiryTime).toString()).getTime();
-            
 
-            if(curDate <= user.expiryTime){
-                const user = setVerification(user.email);
-                logger.info({
-                    message: "User verification successful",
-                    severity: 'INFO'
-                  });
-                response.status(200).send();
+            if(curDate <= user.expiryTime.getTime()){
+                setVerification(user.email).then(()=>{
+                    logger.info({
+                        message: "User verification successful",
+                        severity: 'INFO'
+                      });
+                      response.status(200).send();
+                })
+                .catch((err)=>{
+                    setErrorResponse(403,"Verification Success , failed to update DB.",response);
+                })
             } else {
                 setErrorResponse(403,"Verification failed! Verification link has expired.",response);
             }
-            
         }
         else {
             setErrorResponse(400,"Broken link! Verification token does not exist.",response);
