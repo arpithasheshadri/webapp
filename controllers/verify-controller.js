@@ -11,13 +11,8 @@ export const verifyUser = async (request, response) => {
     response.set('Cache-Control', 'no-cache');
     try {
         const user = await userVerification(token);
-        logger.info({message: `user: ${user}`,
-        severity: 'INFO'});
         if(user){
             const curDate = Date.now();
-            logger.info({message: `token: ${token}, curDate: ${curDate}, expiryTime: ${user.expiryTime}`,
-            severity: 'INFO'});
-
             if(curDate <= user.expiryTime.getTime()){
                 setVerification(user.email).then(()=>{
                     logger.info({
@@ -27,13 +22,25 @@ export const verifyUser = async (request, response) => {
                       response.status(200).send();
                 })
                 .catch((err)=>{
+                    logger.error({
+                        message: "Verification Success , failed to update DB",
+                        severity: 'ERROR'
+                      });
                     setErrorResponse(403,"Verification Success , failed to update DB.",response);
                 })
             } else {
+                logger.error({
+                    message: "Verification failed! Verification link has expired.",
+                    severity: 'ERROR'
+                  });
                 setErrorResponse(403,"Verification failed! Verification link has expired.",response);
             }
         }
         else {
+            logger.error({
+                message: "Broken link! Verification token does not exist.",
+                severity: 'ERROR'
+              });
             setErrorResponse(400,"Broken link! Verification token does not exist.",response);
         }
       

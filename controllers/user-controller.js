@@ -14,8 +14,8 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({
-  override: true,
-  path: path.join(__dirname,'../development.env')
+    override: true,
+    path: path.join(__dirname, '../development.env')
 });
 
 const pubsub = new PubSub();
@@ -46,7 +46,7 @@ export const createUser = async (request, response) => {
                 last_name: request.body.last_name
             }
             const addedUser = await addUser(user);
-            if(process.env.APP_ENV == 'test'){
+            if (process.env.APP_ENV == 'test') {
                 addedUser.is_verified = true
                 addedUser.save();
             }
@@ -67,7 +67,7 @@ export const createUser = async (request, response) => {
                 message: `User creation completef`,
                 severity: 'DEBUG'
             });
-            if(process.env.APP_ENV == 'prod'){
+            if (process.env.APP_ENV == 'prod') {
                 let data = {
                     username: addedUser.username
                 }
@@ -88,7 +88,7 @@ export const createUser = async (request, response) => {
                         severity: 'ERROR'
                     });
                 }
-            }            
+            }
             response.status(201).send(responseUser);
         }
     } catch (err) {
@@ -129,10 +129,10 @@ export const getUser = async (request, response) => {
             setErrorResponse(400, "Request body should not be sent", response);
         } else {
             const authenticatedUser = await authentication(auth);
-            if(!authenticatedUser.is_verified){
-                setErrorResponse(401, "User is not verfied", response);
-            } else {
-                if (authenticatedUser) {
+            if (authenticatedUser) {
+                if (!authenticatedUser.is_verified) {
+                    setErrorResponse(401, "User is not verfied", response);
+                } else {
                     let user = {
                         id: authenticatedUser.id,
                         username: authenticatedUser.username,
@@ -150,22 +150,22 @@ export const getUser = async (request, response) => {
                         severity: 'DEBUG'
                     });
                     setResponse(user, response);
-                } else {
-                    logger.error({
-                        message: `Error occured while fetching user : Invalid credentials provided`,
-                        severity: 'ERROR'
-                    });
-                    setErrorResponse(401, "Invalid credentials provided", response);
                 }
-            }  
+            } else {
+                logger.error({
+                    message: `Error occured while fetching user : Invalid credentials provided`,
+                    severity: 'ERROR'
+                });
+                setErrorResponse(401, "Invalid credentials provided", response);
+            }
         }
     } catch (err) {
-        logger.error({
-            message: `Error occured while fetching user : ${err}`,
-            severity: 'ERROR'
-        });
-        setErrorResponse(503, err, response);
-    }
+    logger.error({
+        message: `Error occured while fetching user : ${err}`,
+        severity: 'ERROR'
+    });
+    setErrorResponse(503, err, response);
+}
 }
 
 export const updateUser = async (request, response) => {
@@ -215,10 +215,10 @@ export const updateUser = async (request, response) => {
                     setErrorResponse(400, "Authentication credentials required", response);
                 } else {
                     const authenticatedUser = await authentication(auth);
-                    if(!authenticatedUser.is_verified){
-                        setErrorResponse(401, "User is not verfied", response);
-                    } else {
-                        if (authenticatedUser) {
+                    if (authenticatedUser) {
+                        if (!authenticatedUser.is_verified) {
+                            setErrorResponse(401, "User is not verfied", response);
+                        } else {
                             if (first_name) {
                                 authenticatedUser.first_name = first_name;
                             }
@@ -241,13 +241,13 @@ export const updateUser = async (request, response) => {
                                 severity: 'DEBUG'
                             });
                             response.status(204).send();
-                        } else {
-                            logger.error({
-                                message: `Error occured while updating user : Invalid credentials provided`,
-                                severity: 'ERROR'
-                            });
-                            setErrorResponse(401, "Invalid credentials provided", response);
                         }
+                    } else {
+                        logger.error({
+                            message: `Error occured while updating user : Invalid credentials provided`,
+                            severity: 'ERROR'
+                        });
+                        setErrorResponse(401, "Invalid credentials provided", response);
                     }
                 }
             }
