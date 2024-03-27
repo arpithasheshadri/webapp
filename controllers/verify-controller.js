@@ -10,13 +10,13 @@ export const verifyUser = async (request, response) => {
       });
     response.set('Cache-Control', 'no-cache');
     try {
-        const user = userVerification(token);
+        const user = await userVerification(token);
         logger.info({message: `user: ${user}`,
         severity: 'INFO'});
         if(user){
             const curDate = Date.now();
             logger.info({message: `token: ${token}, curDate: ${curDate}, expiryTime: ${user.expiryTime}`,
-        severity: 'INFO'});
+            severity: 'INFO'});
             // const dbDate = new Date((user.expiryTime).toString()).getTime();
             
 
