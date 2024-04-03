@@ -9,7 +9,7 @@ export const healthCheck = async (request, response) => {
       });
     response.set('Cache-Control', 'no-cache');
     try {
-        if(Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0){
+        if(request.headers['content-type'] && request.headers['content-type'] === 'application/json' || Object.keys(request.body).length != 0 || Object.keys(request.query).length != 0){
             logger.error({
                 message: 'request body (or) request parameter should not be sent',
                 severity: 'INFO'
