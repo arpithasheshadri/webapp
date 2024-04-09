@@ -1,10 +1,13 @@
+# on:
+#   pull_request:
+#     types: [ closed ]
 on:
   pull_request:
-    types: [ closed ]
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
@@ -43,5 +46,44 @@ jobs:
 
     - name: Build Packer template
       run: packer build -var-file="variables.pkrvars.hcl" .
+
+    - name: Get Latest Image from GCP Console
+      run: |
+        echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
+  
+    - name: Create Instance Template
+      run: |
+        gcloud compute instance-templates create instance-template-1 \
+        --instance-template-region=us-east1 \
+        --project=cloud-gcp-tf \
+        --machine-type=e2-medium \
+        --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
+        --metadata=startup-script="#!/bin/bash
+        echo \"NODE_APP_PORT=4001\" > /opt/webapp/development.env
+        echo \"POSTGRES_DB=webapp\" >> /opt/webapp/development.env
+        echo \"POSTGRES_DB_DIALECT=postgres\" >> /opt/webapp/development.env
+        echo \"POSTGRES_DB_PORT=5432\" >> /opt/webapp/development.env
+        echo \"POSTGRES_HOST=10.187.112.2\" >> /opt/webapp/development.env
+        echo \"POSTGRES_PASSWORD=AD-0*vk2qZ\" >> /opt/webapp/development.env
+        echo \"POSTGRES_USER=webapp\" >> /opt/webapp/development.env
+        echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
+        --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
+        --scopes=https://www.googleapis.com/auth/cloud-platform \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/centos-stream-8-2024-03-27-05-00-12,kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,name=disk-1,size=50,type=projects/cloud-gcp-tf/zones/us-east1-b/diskTypes/pd-balanced \
+        --tags=http-server 
+
+    - name: Configure Instance Groups
+      run: |
+        gcloud beta compute instance-groups managed rolling-action start-update webapp-group-manager \
+        --version=template=instance-template-1 \
+        --min-ready=3m \
+        --max-unavailable=1 \
+        --region=us-east1
+        
+    - name: Monitoring the instances
+      run: |
+        gcloud compute instance-groups managed wait-until webapp-group-manager \
+        --version-target-reached \
+        --region=us-east1
 
     
