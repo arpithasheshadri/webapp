@@ -53,7 +53,7 @@ jobs:
   
     - name: Create Instance Template
       run: |
-        gcloud compute instance-templates create instance-template-1 \
+        gcloud compute instance-templates create instance-template-2 \
         --instance-template-region=us-east1 \
         --project=cloud-gcp-tf \
         --machine-type=e2-medium \
@@ -75,7 +75,7 @@ jobs:
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-1 \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-2 \
         --max-surge=3 \
         --max-unavailable=3 \
         --region=us-east1
