@@ -59,13 +59,13 @@ jobs:
         --machine-type=e2-medium \
         --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
-        echo \"NODE_APP_PORT=4001\" > /opt/webapp/development.env
-        echo \"POSTGRES_DB=webapp\" >> /opt/webapp/development.env
-        echo \"POSTGRES_DB_DIALECT=postgres\" >> /opt/webapp/development.env
-        echo \"POSTGRES_DB_PORT=5432\" >> /opt/webapp/development.env
-        echo \"POSTGRES_HOST=10.187.112.2\" >> /opt/webapp/development.env
-        echo \"POSTGRES_PASSWORD=AD-0*vk2qZ\" >> /opt/webapp/development.env
-        echo \"POSTGRES_USER=webapp\" >> /opt/webapp/development.env
+        echo \"SERVER_PORT=4001\" > /opt/webapp/development.env
+        echo \"DATABASE=webapp\" >> /opt/webapp/development.env
+        echo \"DATABASE_SYS=postgres\" >> /opt/webapp/development.env
+        echo \"PORT=5432\" >> /opt/webapp/development.env
+        echo \"HOST=10.187.112.2\" >> /opt/webapp/development.env
+        echo \"PASSWORD=AD-0*vk2qZ\" >> /opt/webapp/development.env
+        echo \"USER=webapp\" >> /opt/webapp/development.env
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
