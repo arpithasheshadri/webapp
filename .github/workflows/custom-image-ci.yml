@@ -76,7 +76,7 @@ jobs:
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
         --version=template=instance-template-1 \
-        --min-ready=3m \
+        --max-surge=3 \
         --max-unavailable=1 \
         --region=us-east1
         
