@@ -74,7 +74,7 @@ jobs:
 
     - name: Configure Instance Groups
       run: |
-        gcloud alpha compute instance-groups managed rolling-action start-update webapp-group-manager \
+        gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
         --version=template=instance-template-1 \
         --min-ready=3m \
         --max-unavailable=1 \
