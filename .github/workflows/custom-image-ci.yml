@@ -52,8 +52,8 @@ jobs:
     - name: Get Latest Image from GCP Console
       id: get_image
       run: |
-        echo "instance_template_name=$(gcloud compute instance-templates list  --project cloud-gcp-tf --filter='name:instance-template-*' --sort-by="~creationTimestamp" --limit=1 --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
-        echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --format='value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "instance_template_name=$(gcloud compute instance-templates list  --project cloud-gcp-tf --filter='name:instance-template-*' --sort-by="~creationTimestamp" --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --format='value(name, createTime)' | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
     
     - name: Increment version for Instance Template Name
       id: NEW_INSTANCE_TEMPLATE
@@ -101,7 +101,7 @@ jobs:
     - name: get kms vm key
       id: kms_vm_key
       run: |
-        echo "kms_vm_key=\$(gcloud kms keys list --location=us-east1 --keyring=${{ steps.kms_keyrings.outputs.kms_keyrings }}  —-filter='name:crypto-key-vms-*' --sort-by='creationTimestamp' --format='value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}') " >> $GITHUB_OUTPUT  
+        echo "kms_vm_key=\$(gcloud kms keys list --location=us-east1 --keyring=${{ steps.kms_keyrings.outputs.kms_keyrings }}  —-filter='name:crypto-key-vms-*' --sort-by='creationTimestamp' --format='value(name, createTime)' | sort -k2,2r | head -n1 | awk '{print $1}') " >> $GITHUB_OUTPUT  
       
 
     - name: Create Instance Template
