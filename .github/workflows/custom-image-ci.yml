@@ -51,12 +51,20 @@ jobs:
       id: get_image
       run: |
         echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
-    - name: Get secrets from GCP secret manager
-      uses: 'google-github-actions/get-secretmanager-secrets@v2'
+    # - name: Get secrets from GCP secret manager
+    #   uses: 'google-github-actions/get-secretmanager-secrets@v2'
+    #   with:
+    #     secrets: |-
+    #         token:cloud-gcp-tf/webapp_secret
+
+    - name: Get Secret from Secret Manager
+      id: get_secret
+      uses: google-github-actions/get-secretmanager-secrets@v1
       with:
-        secrets: |-
-            token:cloud-gcp-tf/webapp_secret
-      
+          name: projects/cloud-gcp-tf/secrets/webapp_secret/versions/latest
+
+    - name: Use Secret
+      run: echo "The value of the secret is ${{ steps.get_secret.outputs.secret }}"
       
 
     - name: Create Instance Template
@@ -78,7 +86,7 @@ jobs:
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_named }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
       env:
           TOKEN: '${{ steps.secrets.outputs.token }}'
