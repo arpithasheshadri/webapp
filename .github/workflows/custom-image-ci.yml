@@ -50,7 +50,34 @@ jobs:
     - name: Get Latest Image from GCP Console
       id: get_image
       run: |
+        echo "instance_template_name=$(gcloud compute instance-templates list  --project cloud-gcp-tf --filter='name:instance-template-*' --sort-by="~creationTimestamp" --limit=1 --format="value(name)")" >> $GITHUB_OUTPUT
         echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
+    
+    - name: Increment version for Instance Template Name
+      id: NEW_INSTANCE_TEMPLATE
+      env:
+        ORIGINAL_STRING: ${{ steps.get_image.outputs.instance_template_name }}
+      run: |
+            #!/bin/bash
+            original_string="${ORIGINAL_STRING}"
+            regex="^(.*?)([0-9]+)$"
+            
+            if [[ $original_string =~ $regex ]]; then
+                prefix="${BASH_REMATCH[1]}"
+                number="${BASH_REMATCH[2]}"
+                new_instance_template_name=$((number + 1))
+                new_string="${prefix}${new_instance_template_name}"
+                echo "New string: $new_string"
+                echo "new_instance_template_name=$new_string" >> $GITHUB_OUTPUT
+            else
+                echo "The string does not end with a number."
+            fi
+
+    - name: Get DB Host Name
+      id: db_host
+      run: |
+          db_host=$(gcloud sql instances describe ${{ steps.get_image.outputs.instance_template_name }} --format="value(ipAddresses.ipAddress)")
+          echo "::set-output name=db_host::$db_host"
     
     - name: Get secrets from GCP secret manager
       id: secrets
@@ -63,20 +90,20 @@ jobs:
     - name: Create Instance Template
       run: |
         echo ${{ steps.secrets.outputs.token }}
-        gcloud compute instance-templates create instance-template-5 \
+        gcloud compute instance-templates create ${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
         --instance-template-region=us-east1 \
         --project=cloud-gcp-tf \
         --machine-type=e2-medium \
         --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
-        echo "SERVER_PORT=${{ steps.secrets.outputs.token['SERVER_PORT'] }}" > /opt/webapp/development.env
-        echo "DATABASE=${{ steps.secrets.outputs.token['DATABASE'] }}" >> /opt/webapp/development.env
-        echo "DATABASE_SYS=${{ steps.secrets.outputs.token['DATABASE_SYS'] }}" >> /opt/webapp/development.env
-        echo "PORT=${{ steps.secrets.outputs.token['PORT'] }}" >> /opt/webapp/development.env
-        echo "HOST=${{ steps.secrets.outputs.token['HOST'] }}" >> /opt/webapp/development.env
-        echo "PASSWORD=${{ steps.secrets.outputs.token['PASSWORD'] }}" >> /opt/webapp/development.env
-        echo "USER=${{ steps.secrets.outputs.token['USER'] }}" >> /opt/webapp/development.env
-        echo "APP_ENV=${{ steps.secrets.outputs.token['APP_ENV'] }}" >> /opt/webapp/development.env \
+        echo \"SERVER_PORT=${{ secrets.NODE_APP_PORT }}\" > /opt/webapp/development.env
+        echo \"DATABASE=webapp\" >> /opt/webapp/development.env
+        echo \"DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}\" >> /opt/webapp/development.env
+        echo \"PORT=${{ secrets.POSTGRES_DB_PORT }}\" >> /opt/webapp/development.env
+        echo \"HOST=${{ steps.db_host.outputs.db_host  }}\" >> /opt/webapp/development.env
+        echo \"PASSWORD=${{ steps.secrets.outputs.token }}\" >> /opt/webapp/development.env
+        echo \"USER=webapp\" >> /opt/webapp/development.env
+        echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
         --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
@@ -87,7 +114,7 @@ jobs:
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-5 \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
         --max-surge=3 \
         --max-unavailable=3 \
         --region=us-east1
