@@ -69,14 +69,18 @@ jobs:
         --machine-type=e2-medium \
         --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
-        echo \"SERVER_PORT=${{ secrets.NODE_APP_PORT }}\" > /opt/webapp/development.env
-        echo \"DATABASE=webapp\" >> /opt/webapp/development.env
-        echo \"DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}\" >> /opt/webapp/development.env
-        echo \"PORT=${{ secrets.POSTGRES_DB_PORT }}\" >> /opt/webapp/development.env
-        echo \"HOST=10.187.112.2\" >> /opt/webapp/development.env
-        echo \"PASSWORD=AD-0*vk2qZ\" >> /opt/webapp/development.env
-        echo \"USER=webapp\" >> /opt/webapp/development.env
-        echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
+        # Split the secrets string into individual lines
+        IFS=$'\n' read -rd '' -a secrets_array <<< "${{ steps.secrets.outputs.token }}"
+
+        # Loop through each line of the secrets array and extract key-value pairs
+        for secret_line in "${secrets_array[@]}"; do
+          # Extract the key and value using awk
+          key=$(echo "$secret_line" | awk -F= '{print $1}')
+          value=$(echo "$secret_line" | awk -F= '{print $2}')
+
+          # Write the key-value pair to the environment file
+          echo "$key=$value" >> /opt/webapp/development.env
+        done \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
         --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_named }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
