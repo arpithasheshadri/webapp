@@ -96,7 +96,7 @@ jobs:
     - name: get kms keyrings
       id: kms_keyrings
       run: |
-        echo "kms_keyrings=$(gcloud kms keyrings list --filter="name:cloud-key-ring-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) --location=us-east1" >> $GITHUB_OUTPUT
+        echo "kms_keyrings=$(gcloud kms keyrings list --location=us-east1 --filter="name:cloud-key-ring-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1)" >> $GITHUB_OUTPUT
           
     - name: get kms vm key
       id: kms_vm_key
