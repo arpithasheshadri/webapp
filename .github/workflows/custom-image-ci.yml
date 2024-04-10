@@ -100,9 +100,8 @@ jobs:
           
     - name: get kms vm key
       id: kms_vm_key
-      run: |
-        echo "kms_vm_key=\$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings }} --location=us-east1 --filter="name:crypto-key-vms-*" --format="value(name)") " >> $GITHUB_OUTPUT  
-      
+      run: | 
+        echo "kms_vm_key=$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings}} --location us-east1 --filter="name:crypto-key-vms" --format="value(name)")" >> $GITHUB_OUTPUT
 
     - name: Create Instance Template
       run: |
