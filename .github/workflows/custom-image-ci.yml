@@ -1,15 +1,15 @@
-# on:
-#   pull_request:
-#     types: [ closed ]
 on:
   pull_request:
-    branches: [ "main" ]
+    types: [ closed ]
+# on:
+#   pull_request:
+#     branches: [ "main" ]
 
 jobs:
-  workflow_call:
+  call_workflow_passing_data:
     uses: ArpithaSheshadriBhat-Cloud-002271380/webapp/.github/workflows/integration-test.yml@main
   build-and-deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
