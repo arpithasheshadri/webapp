@@ -76,7 +76,7 @@ jobs:
     - name: Get DB Host Name
       id: db_host
       run: |
-          db_host=$(gcloud sql instances describe ${{ steps.get_image.outputs.instance_template_name }} --format="value(ipAddresses.ipAddress)")
+          db_host=$(gcloud sql instances describe cloud-vm --format="value(ipAddresses.ipAddress)")
           echo "::set-output name=db_host::$db_host"
     
     - name: Get secrets from GCP secret manager
