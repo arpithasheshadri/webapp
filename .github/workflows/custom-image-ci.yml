@@ -6,8 +6,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  call-resusable:
-    uses: arpithasheshadri/webapp/.github/workflows/integration-test.yml@main
+  # call-resusable:
+  #   uses: arpithasheshadri/webapp/.github/workflows/integration-test.yml@main
   build-and-deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
