@@ -52,10 +52,18 @@ jobs:
          image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')
 
         # echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
-  
+    - name: Get Latest Image from GCP Console
+      uses: 'google-github-actions/get-secretmanager-secrets@v2'
+      with:
+        secrets: |-
+            token: cloud-gcp-tf/webapp_secret
+      
+      
+
     - name: Create Instance Template
       run: |
-        gcloud compute instance-templates create instance-template-3 \
+        echo $TOKEN
+        gcloud compute instance-templates create instance-template-4 \
         --instance-template-region=us-east1 \
         --project=cloud-gcp-tf \
         --machine-type=e2-medium \
@@ -73,11 +81,13 @@ jobs:
         --scopes=https://www.googleapis.com/auth/cloud-platform \
         --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/$image_name,kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
+      env:
+          TOKEN: '${{ steps.secrets.outputs.token }}'
 
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-3 \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-4 \
         --max-surge=3 \
         --max-unavailable=3 \
         --region=us-east1
