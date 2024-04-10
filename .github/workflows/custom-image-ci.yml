@@ -51,20 +51,13 @@ jobs:
       id: get_image
       run: |
         echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name)')" >> $GITHUB_OUTPUT
-    # - name: Get secrets from GCP secret manager
-    #   uses: 'google-github-actions/get-secretmanager-secrets@v2'
-    #   with:
-    #     secrets: |-
-    #         token:cloud-gcp-tf/webapp_secret
-
-    - name: Get Secret from Secret Manager
-      id: get_secret
-      uses: google-github-actions/get-secretmanager-secrets@v2
+    
+    - name: Get secrets from GCP secret manager
+      id: secrets
+      uses: 'google-github-actions/get-secretmanager-secrets@v2'
       with:
-        secrets: projects/cloud-gcp-tf/secrets/webapp_secret
-
-    - name: Use Secret
-      run: echo "The value of the secret is ${{ steps.get_secret.outputs.secrets }}"
+        secrets: |-
+            token:cloud-gcp-tf/webapp_secret
       
 
     - name: Create Instance Template
