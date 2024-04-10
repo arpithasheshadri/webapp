@@ -63,7 +63,7 @@ jobs:
     - name: Create Instance Template
       run: |
         echo ${{ steps.secrets.outputs.token }}
-        gcloud compute instance-templates create instance-template-4 \
+        gcloud compute instance-templates create instance-template-5 \
         --instance-template-region=us-east1 \
         --project=cloud-gcp-tf \
         --machine-type=e2-medium \
@@ -83,7 +83,7 @@ jobs:
         done \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_named }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
       env:
           TOKEN: '${{ steps.secrets.outputs.token }}'
@@ -91,7 +91,7 @@ jobs:
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-4 \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/instance-template-5 \
         --max-surge=3 \
         --max-unavailable=3 \
         --region=us-east1
