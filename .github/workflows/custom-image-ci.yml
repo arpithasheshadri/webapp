@@ -6,6 +6,8 @@ on:
     branches: [ "main" ]
 
 jobs:
+  call-resusable:
+    uses: arpithasheshadri/webapp/.github/workflows/integration-test.yml@main
   build-and-deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
@@ -99,7 +101,7 @@ jobs:
     - name: get kms vm key
       id: kms_vm_key
       run: |
-        echo "kms_vm_key=$(gcloud kms keys list (--keyring= : --location=us-east1) —filter="name:crypto-key-vms-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) >> $GITHUB_OUTPUT
+        echo "kms_vm_key=$(gcloud kms keys list (--keyring=${{ steps.kms_keyrings.outputs.kms_keyrings }} : --location=us-east1) —filter="name:crypto-key-vms-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) >> $GITHUB_OUTPUT
           
       
 
