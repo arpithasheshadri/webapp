@@ -52,8 +52,8 @@ jobs:
     - name: Get Latest Image from GCP Console
       id: get_image
       run: |
-        echo "instance_template_name=$(gcloud compute instance-templates list  --project cloud-gcp-tf --filter='name:instance-template-*' --sort-by="~creationTimestamp" --limit=1 --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
-        echo "image_name=$(gcloud compute images list --project cloud-gcp-tf --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name, createTime)' | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "instance_template_name=$(gcloud compute instance-templates list  --project ${{ secrets.PROJECT_ID }} --filter='name:instance-template-*' --sort-by="~creationTimestamp" --limit=1 --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "image_name=$(gcloud compute images list --project ${{ secrets.PROJECT_ID }} --filter='name:centos-stream-8-*' --sort-by=~creationTimestamp --limit=1 --format='value(name, createTime)' | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
     
     - name: Increment version for Instance Template Name
       id: NEW_INSTANCE_TEMPLATE
@@ -83,7 +83,7 @@ jobs:
     - name: get CloudSQL IP
       id: fetch_db_hostname
       run: |
-            database_hostname=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format='get(ipAddresses[0].ipAddress)' --project=cloud-gcp-tf)
+            database_hostname=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format='get(ipAddresses[0].ipAddress)' --project=${{ secrets.PROJECT_ID }})
             echo "::set-output name=database_hostname::$database_hostname"
     
     - name: Get secrets from GCP secret manager
@@ -91,7 +91,7 @@ jobs:
       uses: 'google-github-actions/get-secretmanager-secrets@v2'
       with:
         secrets: |-
-            token:cloud-gcp-tf/webapp_secret
+            token:${{ secrets.PROJECT_ID }}/webapp_secret
     
     - name: get kms keyrings
       id: kms_keyrings
@@ -108,9 +108,9 @@ jobs:
         echo ${{ steps.secrets.outputs.token }}
         gcloud compute instance-templates create ${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
         --instance-template-region=us-east1 \
-        --project=cloud-gcp-tf \
+        --project=${{ secrets.PROJECT_ID }} \
         --machine-type=e2-medium \
-        --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
+        --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/us-east1/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
         echo \"SERVER_PORT=${{ secrets.NODE_APP_PORT }}\" > /opt/webapp/development.env
         echo \"DATABASE=${{ secrets.DB_NAME_USER }}\" >> /opt/webapp/development.env
@@ -120,9 +120,9 @@ jobs:
         echo \"PASSWORD=${{ steps.secrets.outputs.token }}\" >> /opt/webapp/development.env
         echo \"USER=${{ secrets.DB_NAME_USER }}\" >> /opt/webapp/development.env
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
-        --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
+        --service-account=webapp-account@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=${{ steps.kms_vm_key.outputs.kms_vm_key}},mode=rw,size=50,type=pd-balanced \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/${{ secrets.PROJECT_ID }}/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/${{ steps.kms_keyrings.outputs.kms_keyrings }}/cryptoKeys/${{ steps.kms_vm_key.outputs.kms_vm_key}},mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
       env:
           TOKEN: '${{ steps.secrets.outputs.token }}'
@@ -130,7 +130,7 @@ jobs:
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/instanceTemplates/${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/us-east1/instanceTemplates/${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
         --max-surge=3 \
         --max-unavailable=3 \
         --region=us-east1
