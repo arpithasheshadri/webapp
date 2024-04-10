@@ -73,10 +73,10 @@ jobs:
                 echo "The string does not end with a number."
             fi
 
-    - name: get instance name
+    - name: get cloud sql instance name
       id: instance_name
       run: |
-        echo "instance_name=$(gcloud compute instances list --filter="name:webapp-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) " >> $GITHUB_OUTPUT
+        echo "instance_name=$(gcloud sql instances list --filter="name:db-instance-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) " >> $GITHUB_OUTPUT
     
     - name: Fetch CloudSQL Host IP
       id: fetch_db_hostname
