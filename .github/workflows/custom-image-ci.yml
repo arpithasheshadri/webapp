@@ -78,16 +78,11 @@ jobs:
       run: |
         echo "instance_name=$(gcloud sql instances list --filter="name:db-instance-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) " >> $GITHUB_OUTPUT
     
-    - name: Fetch CloudSQL Host IP
+    - name: get CloudSQL IP
       id: fetch_db_hostname
       run: |
-            DATABASE_HOSTNAME=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format='get(ipAddresses[0].ipAddress)' --project=cloud-gcp-tf)
-            echo "::set-output name=DATABASE_HOSTNAME::$DATABASE_HOSTNAME"
-    # - name: Get DB Host Name
-    #   id: db_host
-    #   run: |
-    #       db_host=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format="value(ipAddresses.ipAddress)")
-    #       echo "::set-output name=db_host::$db_host"
+            database_hostname=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format='get(ipAddresses[0].ipAddress)' --project=cloud-gcp-tf)
+            echo "::set-output name=database_hostname::$database_hostname"
     
     - name: Get secrets from GCP secret manager
       id: secrets
@@ -95,6 +90,17 @@ jobs:
       with:
         secrets: |-
             token:cloud-gcp-tf/webapp_secret
+    
+    - name: get kms keyrings
+      id: kms_keyrings
+      run: |
+        echo "kms_keyrings=$(gcloud kms keyrings list --filter="name:cloud-key-ring-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) --location=us-east1" >> $GITHUB_OUTPUT
+          
+    - name: get kms vm key
+      id: kms_vm_key
+      run: |
+        echo "kms_vm_key=$(gcloud kms keys list (--keyring= : --location=us-east1) —filter="name:crypto-key-vms-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) >> $GITHUB_OUTPUT
+          
       
 
     - name: Create Instance Template
@@ -107,16 +113,16 @@ jobs:
         --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/cloud-gcp-tf/regions/us-east1/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
         echo \"SERVER_PORT=${{ secrets.NODE_APP_PORT }}\" > /opt/webapp/development.env
-        echo \"DATABASE=webapp\" >> /opt/webapp/development.env
+        echo \"DATABASE=${{ secrets.DB_NAME_USER }}\" >> /opt/webapp/development.env
         echo \"DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}\" >> /opt/webapp/development.env
         echo \"PORT=${{ secrets.POSTGRES_DB_PORT }}\" >> /opt/webapp/development.env
-        echo \"HOST=${{ steps.fetch_db_hostname.outputs.DATABASE_HOSTNAME  }}\" >> /opt/webapp/development.env
+        echo \"HOST=${{ steps.fetch_db_hostname.outputs.database_hostname  }}\" >> /opt/webapp/development.env
         echo \"PASSWORD=${{ steps.secrets.outputs.token }}\" >> /opt/webapp/development.env
-        echo \"USER=webapp\" >> /opt/webapp/development.env
+        echo \"USER=${{ secrets.DB_NAME_USER }}\" >> /opt/webapp/development.env
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
         --service-account=webapp-account@cloud-gcp-tf.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/cloud-key-ring-three/cryptoKeys/crypto-key-vms-three,mode=rw,size=50,type=pd-balanced \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/cloud-gcp-tf/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/${{ steps.kms_keyrings.outputs.kms_keyrings }}/cryptoKeys/${{ steps.kms_vm_key.outputs.kms_vm_key}},mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
       env:
           TOKEN: '${{ steps.secrets.outputs.token }}'
