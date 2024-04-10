@@ -6,8 +6,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # call-resusable:
-  #   uses: arpithasheshadri/webapp/.github/workflows/integration-test.yml@main
+  workflow_call:
+    uses: ArpithaSheshadriBhat-Cloud-002271380/webapp/.github/workflows/integration-test.yml@main
   build-and-deploy:
     # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
@@ -96,21 +96,21 @@ jobs:
     - name: get kms keyrings
       id: kms_keyrings
       run: |
-        echo "kms_keyrings=$(gcloud kms keyrings list --location=us-east1 --sort-by="creationTimestamp" --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "kms_keyrings=$(gcloud kms keyrings list --location=${{ secrets.GCP_REGION }} --sort-by="creationTimestamp" --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
           
     - name: get kms vm key
       id: kms_vm_key
       run: | 
-        echo "kms_vm_key=$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings}} --location us-east1 --filter="name:crypto-key-vms" --format="value(name)")" >> $GITHUB_OUTPUT
+        echo "kms_vm_key=$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings}} --location ${{ secrets.GCP_REGION }} --filter="name:crypto-key-vms" --format="value(name)")" >> $GITHUB_OUTPUT
 
     - name: Create Instance Template
       run: |
         echo ${{ steps.secrets.outputs.token }}
         gcloud compute instance-templates create ${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
-        --instance-template-region=us-east1 \
+        --instance-template-region=${{ secrets.GCP_REGION }} \
         --project=${{ secrets.PROJECT_ID }} \
         --machine-type=e2-medium \
-        --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/us-east1/subnetworks/webapp \
+        --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=https://www.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/${{ secrets.GCP_REGION }}/subnetworks/webapp \
         --metadata=startup-script="#!/bin/bash
         echo \"SERVER_PORT=${{ secrets.NODE_APP_PORT }}\" > /opt/webapp/development.env
         echo \"DATABASE=${{ secrets.DB_NAME_USER }}\" >> /opt/webapp/development.env
@@ -130,15 +130,15 @@ jobs:
     - name: Configure Instance Groups
       run: |
         gcloud compute instance-groups managed rolling-action start-update webapp-group-manager \
-        --version=template=https://compute.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/us-east1/instanceTemplates/${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
+        --version=template=https://compute.googleapis.com/compute/v1/projects/${{ secrets.PROJECT_ID }}/regions/${{ secrets.GCP_REGION }}/instanceTemplates/${{ steps.NEW_INSTANCE_TEMPLATE.outputs.new_instance_template_name }} \
         --max-surge=3 \
         --max-unavailable=3 \
-        --region=us-east1
+        --region=${{ secrets.GCP_REGION }}
         
     - name: Monitoring the instances
       run: |
         gcloud compute instance-groups managed wait-until webapp-group-manager \
         --version-target-reached \
-        --region=us-east1
+        --region=${{ secrets.GCP_REGION }}
 
     
