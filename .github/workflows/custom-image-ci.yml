@@ -96,12 +96,12 @@ jobs:
     - name: get kms keyrings
       id: kms_keyrings
       run: |
-        echo "kms_keyrings=$(gcloud kms keyrings list --location=us-east1 --sort-by="creationTimestamp" --limit=1 --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
+        echo "kms_keyrings=$(gcloud kms keyrings list --location=us-east1 --sort-by="creationTimestamp" --format="value(name, createTime)" | sort -k2,2r | head -n1 | awk '{print $1}')" >> $GITHUB_OUTPUT
           
     - name: get kms vm key
       id: kms_vm_key
       run: | 
-        echo "kms_vm_key=$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings}} --location us-east1 --filter="name:crypto-key-vms" --limit=1 --format="value(name)")" >> $GITHUB_OUTPUT
+        echo "kms_vm_key=$(gcloud kms keys list --keyring ${{ steps.kms_keyrings.outputs.kms_keyrings}} --location us-east1 --filter="name:crypto-key-vms" --format="value(name)")" >> $GITHUB_OUTPUT
 
     - name: Create Instance Template
       run: |
@@ -122,7 +122,7 @@ jobs:
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
         --service-account=webapp-account@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com \
         --scopes=https://www.googleapis.com/auth/cloud-platform \
-        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/${{ secrets.PROJECT_ID }}/global/images/${{ steps.get_image.outputs.image_name }},kms-key=projects/cloud-gcp-tf/locations/us-east1/keyRings/${{ steps.kms_keyrings.outputs.kms_keyrings }}/cryptoKeys/${{ steps.kms_vm_key.outputs.kms_vm_key}},mode=rw,size=50,type=pd-balanced \
+        --create-disk=auto-delete=yes,boot=yes,device-name=disk-1,image=projects/${{ secrets.PROJECT_ID }}/global/images/${{ steps.get_image.outputs.image_name }},kms-key=${{ steps.kms_vm_key.outputs.kms_vm_key}},mode=rw,size=50,type=pd-balanced \
         --tags=http-server 
       env:
           TOKEN: '${{ steps.secrets.outputs.token }}'
