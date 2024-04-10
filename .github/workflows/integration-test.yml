@@ -2,6 +2,8 @@ name: integration testing api
 on:
     pull_request:
         branches: [ "main" ]
+    workflow_call:
+
 
 jobs:
     api-test:
