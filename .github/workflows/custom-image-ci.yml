@@ -77,12 +77,17 @@ jobs:
       id: instance_name
       run: |
         echo "instance_name=$(gcloud compute instances list --filter="name:webapp-*" --sort-by="creationTimestamp" --format="value(name)" --limit=1) " >> $GITHUB_OUTPUT
-
-    - name: Get DB Host Name
-      id: db_host
+    
+    - name: Fetch CloudSQL Host IP
+      id: fetch_db_hostname
       run: |
-          db_host=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format="value(ipAddresses.ipAddress)")
-          echo "::set-output name=db_host::$db_host"
+            DATABASE_HOSTNAME=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format='get(ipAddresses[0].ipAddress)' --project=cloud-gcp-tf)
+            echo "::set-output name=DATABASE_HOSTNAME::$DATABASE_HOSTNAME"
+    # - name: Get DB Host Name
+    #   id: db_host
+    #   run: |
+    #       db_host=$(gcloud sql instances describe ${{ steps.instance_name.outputs.instance_name }} --format="value(ipAddresses.ipAddress)")
+    #       echo "::set-output name=db_host::$db_host"
     
     - name: Get secrets from GCP secret manager
       id: secrets
@@ -105,7 +110,7 @@ jobs:
         echo \"DATABASE=webapp\" >> /opt/webapp/development.env
         echo \"DATABASE_SYS=${{ secrets.POSTGRES_DB_DIALECT }}\" >> /opt/webapp/development.env
         echo \"PORT=${{ secrets.POSTGRES_DB_PORT }}\" >> /opt/webapp/development.env
-        echo \"HOST=${{ steps.db_host.outputs.db_host  }}\" >> /opt/webapp/development.env
+        echo \"HOST=${{ steps.fetch_db_hostname.outputs.DATABASE_HOSTNAME  }}\" >> /opt/webapp/development.env
         echo \"PASSWORD=${{ steps.secrets.outputs.token }}\" >> /opt/webapp/development.env
         echo \"USER=webapp\" >> /opt/webapp/development.env
         echo \"APP_ENV=prod\" >> /opt/webapp/development.env" \
