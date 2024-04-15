@@ -6,7 +6,7 @@ import {expect} from 'chai';
 const request = supertest(app);
 
 
-describe('User /v1/user API Integration Tests', () => {
+describe('User /v2/user API Integration Tests', () => {
   
 
   // Test 1: Create an account and validate it exists
@@ -19,13 +19,13 @@ describe('User /v1/user API Integration Tests', () => {
     };
 
     const response = await request
-      .post('/v1/user')
+      .post('/v2/user')
       .send(newUser).expect(201);
 
     const createdUser = response.body;
 
     const getResponse = await request
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('Authorization', 'Basic ' + Buffer.from(newUser.username+':'+newUser.password).toString('base64')).expect(200);
 
 
@@ -51,13 +51,13 @@ describe('User /v1/user API Integration Tests', () => {
       };
 
     const response = await request
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('Authorization', 'Basic ' + Buffer.from(userData.username+':'+userData.password).toString('base64'))
       .send(update)
       .expect(204);
 
     const getResponse = await request
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('Authorization', 'Basic ' + Buffer.from(userData.username+':'+update.password).toString('base64'))
       .expect(200);
 

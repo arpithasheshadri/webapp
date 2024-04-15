@@ -4,6 +4,6 @@ import verifyRoute from './verify-route.js';
 
 export default (app) => {
   app.use("/healthz", healthCheckRouter);
-  app.use("/v1/user", userRouter);
+  app.use("/v2/user", userRouter);
   app.use("/verify", verifyRoute);
 };
